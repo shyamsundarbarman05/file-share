@@ -5,19 +5,9 @@ import multer from "multer";
 import { nanoid } from "nanoid";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Ensure the uploads directory exists
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -25,7 +15,6 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connection
 mongoose
@@ -47,7 +36,7 @@ const File = mongoose.model("File", fileSchema);
 // Multer setup for file storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "/tmp"); // Use the /tmp directory for Vercel
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
